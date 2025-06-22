@@ -1,0 +1,192 @@
+<!-- shift_planer/templates/shift_planer/shift_assignment_form.html -->
+{% extends 'base.html' %}
+
+{% load custom_filters %} {# Stelle sicher, dass custom_filters geladen ist #}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    {# Back navigation links #}
+    {% if back_to_day_url %}
+        <div class="mb-4">
+            <a href="{{ back_to_day_url }}"
+               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Zurück zum Tagesplan
+            </a>
+        </div>
+    {% elif back_to_month_url %}
+        <div class="mb-4">
+            <a href="{{ back_to_month_url }}"
+               class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Zurück zum Monatsplan
+            </a>
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6 p-6 bg-white rounded-lg shadow-md">
+        {% csrf_token %}
+
+        {# Hidden fields for ward, date, shift if they are already known #}
+        {# These ensure the values are always sent with the form submission, even if displayed statically #}
+        {% if ward %}<input type="hidden" name="ward" value="{{ ward.pk }}">{% endif %}
+        {% if date %}<input type="hidden" name="date" value="{{ date|date:"Y-m-d" }}">{% endif %}
+        {% if shift %}<input type="hidden" name="shift" value="{{ shift.pk }}">{% endif %}
+
+
+        {# Section for Fixed Information (Ward, Date, Shift if pre-selected) or Form Fields for selection #}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+            {# Ward Display or Select #}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Station:</label>
+                {% if ward %}
+                    <p class="mt-1 text-sm text-gray-900 font-semibold">{{ ward.name }}</p>
+                {% else %}
+                    <div class="mt-1">
+                        {{ form.ward }}
+                    </div>
+                    {% for error in form.ward.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Date Display or Select #}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Datum:</label>
+                {% if date %}
+                    <p class="mt-1 text-sm text-gray-900 font-semibold">{{ date|date:"d. F Y" }}</p>
+                {% else %}
+                    <div class="mt-1">
+                        {{ form.date }}
+                    </div>
+                    {% for error in form.date.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Shift Display or Select #}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Schicht:</label>
+                {% if shift %}
+                    <p class="mt-1 text-sm text-gray-900 font-semibold">
+                        {{ shift.get_name_display }} ({{ shift.start_time|time:"H:i" }}-{{ shift.end_time|time:"H:i" }})
+                    </p>
+                {% else %}
+                    <div class="mt-1">
+                        {{ form.shift }}
+                    </div>
+                    {% for error in form.shift.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        {# Professional Nurses Section #}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">{{ form.professional_nurses.label }}</label>
+            <div class="mt-1 space-y-3">
+                {% for choice in form.professional_nurses %}
+                    {% with emp_pk=choice.data.value %}
+                        {% with emp_details=employee_display_data|get_item:emp_pk %}
+                            <div class="relative flex items-start p-4 border border-gray-200 rounded-md bg-gray-50 shadow-sm">
+                                <div class="flex items-center h-5">
+                                    {# Django's choice.tag renders the input (checkbox) and its basic attributes #}
+                                    {{ choice.tag }}
+                                </div>
+                                <div class="ml-3 text-sm flex-grow">
+                                    <label for="{{ choice.id_for_label }}" class="font-medium text-gray-900">
+                                        {{ emp_details.first_name }} {{ emp_details.last_name }}
+                                        {% if emp_details.professional_profile_name %}
+                                            <span class="text-gray-600 text-xs">({{ emp_details.professional_profile_name }})</span>
+                                        {% endif %}
+                                    </label>
+                                    {% if emp_details.qualifications %}
+                                        <p class="text-xs text-gray-600 mt-0.5">Qualifikationen: {{ emp_details.qualifications|join:", " }}</p>
+                                    {% endif %}
+                                    {% if emp_details.allowed_shifts %}
+                                        <p class="text-xs text-gray-600 mt-0.5">Erlaubte Schichten: {{ emp_details.allowed_shifts|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% for error in form.professional_nurses.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        {# Nursing Assistants Section #}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">{{ form.nursing_assistants.label }}</label>
+            <div class="mt-1 space-y-3">
+                {% for choice in form.nursing_assistants %}
+                    {% with emp_pk=choice.data.value %}
+                        {% with emp_details=employee_display_data|get_item:emp_pk %}
+                            <div class="relative flex items-start p-4 border border-gray-200 rounded-md bg-gray-50 shadow-sm">
+                                <div class="flex items-center h-5">
+                                    {# Render the actual checkbox input and its basic attributes #}
+                                    {{ choice.tag }}
+                                </div>
+                                <div class="ml-3 text-sm flex-grow">
+                                    <label for="{{ choice.id_for_label }}" class="font-medium text-gray-900">
+                                        {{ emp_details.first_name }} {{ emp_details.last_name }}
+                                        {% if emp_details.professional_profile_name %}
+                                            <span class="text-gray-600 text-xs">({{ emp_details.professional_profile_name }})</span>
+                                        {% endif %}
+                                    </label>
+                                    {% if emp_details.qualifications %}
+                                        <p class="text-xs text-gray-600 mt-0.5">Qualifikationen: {{ emp_details.qualifications|join:", " }}</p>
+                                    {% endif %}
+                                    {% if emp_details.allowed_shifts %}
+                                        <p class="text-xs text-gray-600 mt-0.5">Erlaubte Schichten: {{ emp_details.allowed_shifts|join:", " }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            {% for error in form.nursing_assistants.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        {# Statusfeld #}
+        <div class="mb-4">
+            <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                {{ form.status.label }}
+            </label>
+            <div class="mt-1">
+                {{ form.status }}
+            </div>
+            {% for error in form.status.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 p-4 text-orange-700 bg-orange-100 border border-orange-200 rounded-md">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <button type="submit"
+                class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+            Speichern
+        </button>
+    </form>
+{% endblock content %}

@@ -1,0 +1,49 @@
+<!-- schichtplanung/templates/schichtplanung/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+    <p class="mb-6 text-gray-700">Wählen Sie eine Station und einen Monat, um den Schichtplan anzuzeigen oder zu bearbeiten.</p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %} {# Django's protection against Cross Site Request Forgeries #}
+        <div>
+            <label for="ward_select" class="block text-sm font-medium text-gray-700">Station auswählen:</label>
+            <select name="ward" id="ward_select" required
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
+                {% for ward in wards %}
+                    <option value="{{ ward.id }}">{{ ward.name }}</option>
+                {% empty %}
+                    <option value="">Keine Stationen gefunden. Bitte im Admin-Bereich anlegen.</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex space-x-4">
+            <div class="flex-1">
+                <label for="month_select" class="block text-sm font-medium text-gray-700">Monat auswählen:</label>
+                <select name="month" id="month_select" required
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
+                    {% for month_num, month_name in months %}
+                        <option value="{{ month_num }}" {% if month_num == current_month %}selected{% endif %}>{{ month_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="year_select" class="block text-sm font-medium text-gray-700">Jahr auswählen:</label>
+                <input type="number" name="year" id="year_select" value="{{ current_year }}" required
+                        class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
+            </div>
+        </div>
+
+        <div>
+            <button type="submit"
+                    class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                Schichtplan anzeigen
+            </button>
+        </div>
+    </form>
+{% endblock %}
+    

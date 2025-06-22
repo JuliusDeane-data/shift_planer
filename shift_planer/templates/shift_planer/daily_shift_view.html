@@ -1,0 +1,121 @@
+<!-- shift_planer/templates/shift_planer/daily_shift_view.html -->
+{% extends 'base.html' %}
+{% load custom_filters %} {# Stellen Sie sicher, dass custom_filters geladen ist #}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    {# Back navigation links #}
+    <div class="mb-4">
+        <a href="{% url 'shift_planer:shift_calendar' ward.slug month_link_year month_link_month %}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Zurück zum Monatsplan
+        </a>
+        {# Link zum Hinzufügen einer neuen Schicht für diesen Tag #}
+        <a href="{% url 'shift_planer:plan_shift_for_day' ward_name_slug=ward.slug year=selected_date.year month=selected_date.month day=selected_date.day %}"
+           class="ml-3 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Schicht hinzufügen
+        </a>
+    </div>
+
+    <div class="space-y-6">
+        {% if shifts_data %}
+            {% for shift_name_display, shift_details in shifts_data.items %}
+                <div class="rounded-lg shadow-md p-6 border
+                    {% if shift_details.assignments|has_conflict_in_assignments %}
+                        bg-red-50 border-red-300
+                    {% else %}
+                        bg-white border-gray-200
+                    {% endif %}
+                ">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800">
+                            {{ shift_name_display }} ({{ shift_details.shift_start_time|time:"H:i" }} - {{ shift_details.shift_end_time|time:"H:i" }})
+                        </h2>
+                        <div class="flex space-x-2">
+                            {# Link zum Bearbeiten dieser spezifischen Schicht am Tag #}
+                            <a href="{% url 'shift_planer:edit_shift_plan' ward_name_slug=ward.slug year=selected_date.year month=selected_date.month day=selected_date.day shift_id=shift_details.shift_pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                    <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                </svg>
+                                Bearbeiten
+                            </a>
+                            {# Link zum Löschen dieser spezifischen Schicht am Tag #}
+                            <a href="{% url 'shift_planer:delete_shift_plan' ward_name_slug=ward.slug year=selected_date.year month=selected_date.month day=selected_date.day shift_id=shift_details.shift_pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                                </svg>
+                                Löschen
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-gray-700"><strong>Besetzung:</strong> {{ shift_details.assigned_total_staff_count }} Mitarbeiter</p>
+                        <p class="text-gray-700">
+                            <strong>Pflegefachkräfte:</strong> {{ shift_details.assigned_professional_nurses_count }} / {{ shift_details.required_professional_nurses_count }} benötigt
+                            {% if shift_details.assigned_professional_nurses_count < shift_details.required_professional_nurses_count %}
+                                <span class="ml-2 text-red-600 font-semibold">(Unterbesetzt!)</span>
+                            {% elif shift_details.assigned_professional_nurses_count > shift_details.required_professional_nurses_count %}
+                                <span class="ml-2 text-green-600 font-semibold">(Ausreichend besetzt)</span>
+                            {% else %}
+                                <span class="ml-2 text-green-600 font-semibold">(Soll erfüllt)</span>
+                            {% endif %}
+                        </p>
+                        <p class="text-gray-700">
+                            <strong>Kritische Qualifikation:</strong> 
+                            {% if shift_details.is_critical_qual_needed %}
+                                {% if shift_details.is_critical_qual_met %}
+                                    <span class="text-green-600 font-semibold">Erfüllt</span>
+                                {% else %}
+                                    <span class="text-red-600 font-semibold">Nicht erfüllt!</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-gray-500">Nicht erforderlich</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if shift_details.assignments %}
+                        <ul class="space-y-2">
+                            {% for assignment in shift_details.assignments %}
+                                <li class="p-3 rounded-md border
+                                    {% if assignment.status == 'KONFLIKT' %}
+                                        bg-red-100 text-red-800 border-red-300
+                                    {% elif assignment.status == 'UNASSIGNED' %}
+                                        bg-orange-100 text-orange-800 border-orange-300
+                                    {% elif assignment.status == 'CONFIRMED' %}
+                                        bg-green-100 text-green-800 border-green-300
+                                    {% else %} {# Default to PLANNED or any other status #}
+                                        bg-blue-100 text-blue-800 border-blue-300
+                                    {% endif %}
+                                    flex justify-between items-center">
+                                    <span class="font-medium">
+                                        {{ assignment.employee.first_name }} {{ assignment.employee.last_name }}
+                                        <span class="text-xs text-gray-600">({{ assignment.status|upper }})</span>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-gray-600">Keine Mitarbeiter für diese Schicht zugewiesen.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-600">Für dieses Datum und diese Station sind keine Schichtdaten verfügbar.</p>
+        {% endif %}
+    </div>
+
+{% endblock content %}

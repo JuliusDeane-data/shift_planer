@@ -1,0 +1,39 @@
+<!-- shift_planer/templates/shift_planer/confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <p class="mb-4 text-gray-700">Sind Sie sicher, dass Sie {{ object_description }} löschen möchten?</p>
+        <p class="text-red-600 font-semibold mb-6">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+
+        <form method="post" class="flex justify-between items-center">
+            {% csrf_token %}
+            <button type="submit"
+                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200">
+                Ja, löschen
+            </button>
+            {# NEU: Bedingte Anzeige der Zurück-Links #}
+            {% if back_to_profile_url %}
+                <a href="{{ back_to_profile_url }}"
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
+                    Zurück zum Profil
+                </a>
+            {% elif back_to_list_url %} {# Fallback to a general list if no profile URL is applicable #}
+                <a href="{{ back_to_list_url }}"
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
+                    Zurück zur Liste
+                </a>
+            {% else %}
+                <a href="{% url 'shift_planer:home' %}"
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
+                    Abbrechen
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+{% endblock content %}

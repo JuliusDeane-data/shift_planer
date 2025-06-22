@@ -1,0 +1,143 @@
+<!-- shift_planer/templates/shift_planer/employee_profile_overview.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    <div class="mb-4 flex space-x-4">
+        <a href="{{ back_to_employee_list_url }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Zurück zur Mitarbeiterliste
+        </a>
+        <a href="{% url 'shift_planer:employee_edit_profile' pk=employee.pk %}"
+           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+            </svg>
+            Profil bearbeiten
+        </a>
+    </div>
+
+    {# Employee Details #}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Mitarbeiterdetails</h2>
+        <p class="text-gray-700"><strong>Name:</strong> {{ employee.first_name }} {{ employee.last_name }}</p>
+        <p class="text-gray-700"><strong>Mitarbeiternummer:</strong> {{ employee.employee_number|default:"N/A" }}</p>
+        <p class="text-gray-700"><strong>E-Mail:</strong> {{ employee.email|default:"Nicht angegeben" }}</p>
+        <p class="text-gray-700 mt-2"><strong>Qualifikationen:</strong>
+            {% for qual in employee.qualifications.all %}
+                <span class="inline-block bg-blue-200 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mr-1 mb-1">{{ qual.name }}</span>
+            {% empty %}
+                <span class="text-gray-500">Keine</span>
+            {% endfor %}
+        </p>
+        <p class="text-gray-700"><strong>Erlaubte Schichten:</strong>
+            {% for shift in employee.allowed_shifts.all %}
+                <span class="inline-block bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mr-1 mb-1">{{ shift.get_name_display }}</span>
+            {% empty %}
+                <span class="text-gray-500">Alle</span>
+            {% endfor %}
+        </p>
+        <p class="text-gray-700"><strong>Verfügbare Wochenstunden:</strong> {{ employee.available_hours_per_week }}</p>
+    </div>
+
+    {# Employee Availabilities #}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex justify-between items-center">
+            Verfügbarkeiten
+            <a href="{% url 'shift_planer:employee_availability_create' employee_pk=employee.pk %}"
+               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Hinzufügen
+            </a>
+        </h2>
+        {% if availabilities %}
+            <ul class="space-y-2">
+                {% for av in availabilities %}
+                    <li class="bg-gray-50 border border-gray-200 rounded-md p-3 flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-800 font-medium">{{ av.date|date:"d. F Y" }}</p>
+                            <p class="text-sm text-gray-600">Status: 
+                                {% if av.is_available %}
+                                    <span class="text-green-600 font-semibold">Verfügbar</span>
+                                {% else %}
+                                    <span class="text-red-600 font-semibold">Nicht verfügbar</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'shift_planer:employee_availability_update' pk=av.pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-200">
+                                Bearbeiten
+                            </a>
+                            <a href="{% url 'shift_planer:employee_availability_delete' pk=av.pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200">
+                                Löschen
+                            </a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">Keine Verfügbarkeiten für diesen Mitarbeiter eingetragen.</p>
+        {% endif %}
+    </div>
+
+    {# Employee Absences #}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex justify-between items-center">
+            Abwesenheiten
+            <a href="{% url 'shift_planer:absence_create' employee_pk=employee.pk %}"
+               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Hinzufügen
+            </a>
+        </h2>
+        {% if absences %}
+            <ul class="space-y-2">
+                {% for abs in absences %}
+                    <li class="bg-gray-50 border border-gray-200 rounded-md p-3 flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-800 font-medium">
+                                {{ abs.start_date|date:"d. F Y" }} - {{ abs.end_date|date:"d. F Y" }}
+                            </p>
+                            <p class="text-sm text-gray-600">Typ: 
+                                <span class="font-semibold">{{ abs.get_absence_type_display }}</span>
+                            </p>
+                            <p class="text-sm text-gray-600">Status: 
+                                {% if abs.approved %}
+                                    <span class="text-green-600 font-semibold">Genehmigt</span>
+                                {% else %}
+                                    <span class="text-red-600 font-semibold">Nicht genehmigt</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'shift_planer:absence_update' pk=abs.pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-200">
+                                Bearbeiten
+                            </a>
+                            <a href="{% url 'shift_planer:absence_delete' pk=abs.pk %}"
+                               class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200">
+                                Löschen
+                            </a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">Keine Abwesenheiten für diesen Mitarbeiter eingetragen.</p>
+        {% endif %}
+    </div>
+
+{% endblock content %}

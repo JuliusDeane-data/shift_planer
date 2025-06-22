@@ -1,0 +1,566 @@
+[
+  {
+    "model": "shift_planer.professionalprofile",
+    "pk": 1,
+    "fields": {
+      "name": "Pflegefachkraft",
+      "description": "Qualifiziertes Personal mit staatlichem Examen in der Pflege.",
+      "counts_towards_staff_ratio": true
+    }
+  },
+  {
+    "model": "shift_planer.professionalprofile",
+    "pk": 2,
+    "fields": {
+      "name": "Pflegehelfer",
+      "description": "Personal zur Unterstützung der Pflegefachkräfte bei grundlegenden Aufgaben.",
+      "counts_towards_staff_ratio": false
+    }
+  },
+  {
+    "model": "shift_planer.professionalprofile",
+    "pk": 3,
+    "fields": {
+      "name": "Reinigungskraft",
+      "description": "Personal für Reinigungsdienste auf den Stationen.",
+      "counts_towards_staff_ratio": false
+    }
+  },
+
+  {
+    "model": "shift_planer.qualification",
+    "pk": 1,
+    "fields": {
+      "name": "Beatmungsschein",
+      "description": "Zertifikat für die Betreuung beatmeter Patienten.",
+      "is_critical": true
+    }
+  },
+  {
+    "model": "shift_planer.qualification",
+    "pk": 2,
+    "fields": {
+      "name": "Praxisanleiter",
+      "description": "Befähigung zur Anleitung von Auszubildenden.",
+      "is_critical": false
+    }
+  },
+  {
+    "model": "shift_planer.qualification",
+    "pk": 3,
+    "fields": {
+      "name": "Wundexperte",
+      "description": "Spezialist für Wundversorgung.",
+      "is_critical": false
+    }
+  },
+
+  {
+    "model": "shift_planer.shift",
+    "pk": 1,
+    "fields": {
+      "name": "EARLY",
+      "start_time": "06:00:00",
+      "end_time": "14:00:00",
+      "required_qualifications": []
+    }
+  },
+  {
+    "model": "shift_planer.shift",
+    "pk": 2,
+    "fields": {
+      "name": "LATE",
+      "start_time": "14:00:00",
+      "end_time": "22:00:00",
+      "required_qualifications": []
+    }
+  },
+  {
+    "model": "shift_planer.shift",
+    "pk": 3,
+    "fields": {
+      "name": "NIGHT",
+      "start_time": "22:00:00",
+      "end_time": "06:00:00",
+      "required_qualifications": [1]
+    }
+  },
+
+  {
+    "model": "shift_planer.ward",
+    "pk": 1,
+    "fields": {
+      "name": "Station Alpha",
+      "slug": "station-alpha",
+      "description": "Station für allgemeine Pflege",
+      "min_staff_early_shift": 3,
+      "min_staff_late_shift": 3,
+      "min_staff_night_shift": 2,
+      "current_patients": 10
+    }
+  },
+  {
+    "model": "shift_planer.ward",
+    "pk": 2,
+    "fields": {
+      "name": "Station Beta",
+      "slug": "station-beta",
+      "description": "Station mit Fokus auf Intensivpflege",
+      "min_staff_early_shift": 2,
+      "min_staff_late_shift": 2,
+      "min_staff_night_shift": 1,
+      "current_patients": 5
+    }
+  },
+
+  {
+    "model": "shift_planer.employee",
+    "pk": 1,
+    "fields": {
+      "first_name": "Anna",
+      "last_name": "Muster",
+      "employee_number": "EMP001",
+      "phone": "0123-456789",
+      "email": "anna.muster@example.com",
+      "professional_profile": 1,  
+      "qualifications": [1, 2],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 2,
+    "fields": {
+      "first_name": "Ben",
+      "last_name": "Schulz",
+      "employee_number": "EMP002",
+      "phone": "0123-987654",
+      "email": "ben.schulz@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "35.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 3,
+    "fields": {
+      "first_name": "Clara",
+      "last_name": "Weber",
+      "employee_number": "EMP003",
+      "phone": "0123-112233",
+      "email": "clara.weber@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 4,
+    "fields": {
+      "first_name": "Dirk",
+      "last_name": "Klein",
+      "employee_number": "EMP004",
+      "phone": "0123-445566",
+      "email": "dirk.klein@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "20.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 5,
+    "fields": {
+      "first_name": "Elsa",
+      "last_name": "Huber",
+      "employee_number": "EMP005",
+      "phone": "0123-778899",
+      "email": "elsa.huber@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 6,
+    "fields": {
+      "first_name": "Finn",
+      "last_name": "Meier",
+      "employee_number": "EMP006",
+      "phone": "0123-334455",
+      "email": "finn.meier@example.com",
+      "professional_profile": 1,
+      "qualifications": [1],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 7,
+    "fields": {
+      "first_name": "Greta",
+      "last_name": "Neumann",
+      "employee_number": "EMP007",
+      "phone": "0123-667788",
+      "email": "greta.neumann@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "25.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 8,
+    "fields": {
+      "first_name": "Hans",
+      "last_name": "Schmidt",
+      "employee_number": "EMP008",
+      "phone": "0123-101010",
+      "email": "hans.schmidt@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 9,
+    "fields": {
+      "first_name": "Inge",
+      "last_name": "Koch",
+      "employee_number": "EMP009",
+      "phone": "0123-202020",
+      "email": "inge.koch@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 10,
+    "fields": {
+      "first_name": "Jörg",
+      "last_name": "Becker",
+      "employee_number": "EMP010",
+      "phone": "0123-303030",
+      "email": "joerg.becker@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "20.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 11,
+    "fields": {
+      "first_name": "Katrin",
+      "last_name": "Fischer",
+      "employee_number": "EMP011",
+      "phone": "0123-404040",
+      "email": "katrin.fischer@example.com",
+      "professional_profile": 1,
+      "qualifications": [2],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 12,
+    "fields": {
+      "first_name": "Leo",
+      "last_name": "Wagner",
+      "employee_number": "EMP012",
+      "phone": "0123-505050",
+      "email": "leo.wagner@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "38.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 13,
+    "fields": {
+      "first_name": "Mia",
+      "last_name": "Maier",
+      "employee_number": "EMP013",
+      "phone": "0123-606060",
+      "email": "mia.maier@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "25.00",
+      "allowed_shifts": [1]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 14,
+    "fields": {
+      "first_name": "Nico",
+      "last_name": "Müller",
+      "employee_number": "EMP014",
+      "phone": "0123-707070",
+      "email": "nico.mueller@example.com",
+      "professional_profile": 1,
+      "qualifications": [1],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 15,
+    "fields": {
+      "first_name": "Olivia",
+      "last_name": "Hartmann",
+      "employee_number": "EMP015",
+      "phone": "0123-808080",
+      "email": "olivia.hartmann@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "32.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 16,
+    "fields": {
+      "first_name": "Paul",
+      "last_name": "Kruse",
+      "employee_number": "EMP016",
+      "phone": "0123-909090",
+      "email": "paul.kruse@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 17,
+    "fields": {
+      "first_name": "Lena",
+      "last_name": "Richter",
+      "employee_number": "EMP017",
+      "phone": "0123-111222",
+      "email": "lena.richter@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 18,
+    "fields": {
+      "first_name": "Tom",
+      "last_name": "Franke",
+      "employee_number": "EMP018",
+      "phone": "0123-333444",
+      "email": "tom.franke@example.com",
+      "professional_profile": 1,
+      "qualifications": [1],
+      "available_hours_per_week": "35.00",
+      "allowed_shifts": [1, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 19,
+    "fields": {
+      "first_name": "Sarah",
+      "last_name": "Vogel",
+      "employee_number": "EMP019",
+      "phone": "0123-555666",
+      "email": "sarah.vogel@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "20.00",
+      "allowed_shifts": [2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 20,
+    "fields": {
+      "first_name": "Max",
+      "last_name": "Roth",
+      "employee_number": "EMP020",
+      "phone": "0123-777888",
+      "email": "max.roth@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 21,
+    "fields": {
+      "first_name": "Lisa",
+      "last_name": "Wagner",
+      "employee_number": "EMP021",
+      "phone": "0123-999000",
+      "email": "lisa.wagner@example.com",
+      "professional_profile": 1,
+      "qualifications": [2],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 22,
+    "fields": {
+      "first_name": "Jonas",
+      "last_name": "Huber",
+      "employee_number": "EMP022",
+      "phone": "0123-121212",
+      "email": "jonas.huber@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "20.00",
+      "allowed_shifts": [2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 23,
+    "fields": {
+      "first_name": "Sophie",
+      "last_name": "Lehmann",
+      "employee_number": "EMP023",
+      "phone": "0123-343434",
+      "email": "sophie.lehmann@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 24,
+    "fields": {
+      "first_name": "Felix",
+      "last_name": "Braun",
+      "employee_number": "EMP024",
+      "phone": "0123-565656",
+      "email": "felix.braun@example.com",
+      "professional_profile": 1,
+      "qualifications": [1],
+      "available_hours_per_week": "35.00",
+      "allowed_shifts": [3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 25,
+    "fields": {
+      "first_name": "Julia",
+      "last_name": "Schwarz",
+      "employee_number": "EMP025",
+      "phone": "0123-787878",
+      "email": "julia.schwarz@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "25.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 26,
+    "fields": {
+      "first_name": "Moritz",
+      "last_name": "Hahn",
+      "employee_number": "EMP026",
+      "phone": "0123-909090",
+      "email": "moritz.hahn@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 27,
+    "fields": {
+      "first_name": "Lea",
+      "last_name": "Keller",
+      "employee_number": "EMP027",
+      "phone": "0123-212121",
+      "email": "lea.keller@example.com",
+      "professional_profile": 1,
+      "qualifications": [],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 28,
+    "fields": {
+      "first_name": "Simon",
+      "last_name": "Wolff",
+      "employee_number": "EMP028",
+      "phone": "0123-434343",
+      "email": "simon.wolff@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "20.00",
+      "allowed_shifts": [3]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 29,
+    "fields": {
+      "first_name": "Nina",
+      "last_name": "Schmidt",
+      "employee_number": "EMP029",
+      "phone": "0123-565656",
+      "email": "nina.schmidt@example.com",
+      "professional_profile": 1,
+      "qualifications": [1],
+      "available_hours_per_week": "30.00",
+      "allowed_shifts": [1, 2]
+    }
+  },
+  {
+    "model": "shift_planer.employee",
+    "pk": 30,
+    "fields": {
+      "first_name": "Oskar",
+      "last_name": "Zimmermann",
+      "employee_number": "EMP030",
+      "phone": "0123-787878",
+      "email": "oskar.zimmermann@example.com",
+      "professional_profile": 2,
+      "qualifications": [],
+      "available_hours_per_week": "40.00",
+      "allowed_shifts": [1, 2, 3]
+    }
+  }     
+]

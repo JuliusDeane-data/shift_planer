@@ -1,0 +1,68 @@
+<!-- shift_planer/templates/shift_planer/qualification_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    <div class="mb-6 flex justify-end">
+        <a href="{% url 'shift_planer:qualification_create' %}"
+           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+            Neue Qualifikation hinzufügen
+        </a>
+    </div>
+
+    {% if qualifications %}
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kritisch
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Beschreibung
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Aktionen</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for qualification in qualifications %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {{ qualification.name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if qualification.is_critical %}Ja{% else %}Nein{% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ qualification.description|truncatechars:50 }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{% url 'shift_planer:qualification_update' pk=qualification.pk %}"
+                                   class="text-indigo-600 hover:text-indigo-900 mr-4">Bearbeiten</a>
+                                <a href="{% url 'shift_planer:qualification_delete' pk=qualification.pk %}"
+                                   class="text-red-600 hover:text-red-900">Löschen</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-600">Es wurden noch keine Qualifikationen angelegt.</p>
+    {% endif %}
+
+    <div class="mt-6">
+        <a href="{% url 'shift_planer:home' %}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
+            Zurück zur Startseite
+        </a>
+    </div>
+{% endblock content %}

@@ -1,0 +1,86 @@
+<!-- shift_planer/templates/shift_planer/shift_calendar.html -->
+{% extends 'base.html' %}
+{% load custom_filters %} {# This line MUST be at the top after extends! #}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ page_title }}</h1>
+
+    {# Navigation for previous/next month #}
+    <div class="flex justify-between items-center mb-4">
+        <a href="{% url 'shift_planer:shift_calendar' ward_slug_for_urls prev_year prev_month %}" {# Use ward_slug_for_urls #}
+           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200">
+            &lt; Vorheriger Monat
+        </a>
+        <h2 class="text-xl font-semibold text-gray-700">
+            {{ ward.name }} - {{ year }} {{ month|date:"F" }}
+        </h2>
+        <a href="{% url 'shift_planer:shift_calendar' ward_slug_for_urls next_year next_month %}" {# Use ward_slug_for_urls #}
+           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200">
+            Nächster Monat &gt;
+        </a>
+    </div>
+
+    {# Shift Calendar Table #}
+    <div class="overflow-x-auto rounded-lg shadow-md">
+        <table class="min-w-full divide-y divide-gray-200 bg-white">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">
+                        Schicht / Tag
+                    </th>
+                    {% for day_data in calendar_data %}
+                        <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <a href="{% url 'shift_planer:daily_shift_view' ward_slug_for_urls year month day_data.day %}" {# Use ward_slug_for_urls #}
+                               class="hover:text-blue-600 transition duration-150">
+                                {{ day_data.weekday_name }}<br>{{ day_data.day }}.
+                            </a>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for shift in all_shifts %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10">
+                            {{ shift.get_name_display }}<br><span class="text-gray-500 text-xs">{{ shift.start_time|time:"H:i" }}-{{ shift.end_time|time:"H:i" }}</span>
+                        </td>
+                        {% for day_data in calendar_data %}
+                            {# Determine cell background based on conflict status #}
+                            {# NEU: Verschachtelter get_item Aufruf #}
+                            {% with assignments_for_day=assignments_by_day_shift|get_item:day_data.date_obj %}
+                                {% with cell_assignments=assignments_for_day|get_item:shift.id %}
+                                {# Direkt den Filter has_conflict_status auf cell_assignments anwenden #}
+                                <td class="p-2 border-l border-gray-100 text-sm text-gray-900 align-top h-24
+                                    {% if cell_assignments|has_conflict_status %}
+                                        bg-red-100 border-red-300
+                                    {% else %}
+                                        bg-white
+                                    {% endif %}
+                                ">
+                                    {% if cell_assignments %}
+                                        <ul class="space-y-1">
+                                            {% for assignment in cell_assignments %}
+                                                <li class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap overflow-hidden text-ellipsis hover:bg-blue-200 transition duration-150">
+                                                    {{ assignment.employee.first_name }} {{ assignment.employee.last_name|slice:":1" }}.
+                                                    {# Debug-Indikator für Konflikte #}
+                                                    {% if assignment.status == 'KONFLIKT' %}
+                                                        <span class="text-red-600 font-bold ml-1">!K</span>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span class="text-gray-400 text-center block text-xs">Unbesetzt</span>
+                                    {% endif %}
+                                </td>
+                                {% endwith %} {# Ende des inneren with-Blocks für cell_assignments #}
+                            {% endwith %} {# Ende des äußeren with-Blocks für assignments_for_day #}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
